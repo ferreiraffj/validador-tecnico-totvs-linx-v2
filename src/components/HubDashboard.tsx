@@ -5,6 +5,8 @@ import { HubRecord, HubStatus, HubSystem, normalizeImportedPayload } from "../sh
 
 interface HubDashboardProps {
   records: HubRecord[];
+  isRefreshing: boolean;
+  lastSyncAt: Date | null;
   onRecordsImported: (records: HubRecord[]) => void;
   onRefresh: () => void;
   onOpenChat: () => void;
@@ -22,7 +24,7 @@ const statusConfig: Record<HubStatus, { label: string; icon: typeof CheckCircle2
   REPROVADO: { label: "Reprovado", icon: XCircle, classes: "text-rose-700 bg-rose-50 border-rose-200" },
 };
 
-export const HubDashboard: React.FC<HubDashboardProps> = ({ records, onRecordsImported, onRefresh, onOpenChat }) => {
+export const HubDashboard: React.FC<HubDashboardProps> = ({ records, isRefreshing, lastSyncAt, onRecordsImported, onRefresh, onOpenChat }) => {
   const [selected, setSelected] = useState<HubRecord | null>(null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<HubStatus | "TODOS">("TODOS");
@@ -69,7 +71,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({ records, onRecordsIm
             <p className="mt-2 max-w-2xl text-sm text-slate-500">Receba as coletas do executável, acompanhe a auditoria e avance cada implantação com contexto.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button onClick={onRefresh} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300"><RefreshCw className="h-4 w-4" /> Atualizar</button>
+            <button onClick={onRefresh} disabled={isRefreshing} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 disabled:cursor-wait disabled:opacity-60"><RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} /> {isRefreshing ? "Sincronizando..." : "Atualizar"}</button>
             <button onClick={onOpenChat} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300"><Plus className="h-4 w-4" /> Auditoria manual</button>
             <button onClick={() => inputRef.current?.click()} className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"><Upload className="h-4 w-4" /> Importar JSON</button>
             <input ref={inputRef} type="file" accept=".json,application/json" multiple className="hidden" onChange={(event) => void importFiles(event.target.files)} />
@@ -97,7 +99,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({ records, onRecordsIm
             </div>;
           })}
         </section>
-        <p className="mt-6 text-center text-xs text-slate-400"><FileJson className="mr-1 inline h-3.5 w-3.5" /> Importação manual ativa nesta primeira versão · API do coletor será conectada na próxima etapa</p>
+        <p className="mt-6 text-center text-xs text-slate-400"><FileJson className="mr-1 inline h-3.5 w-3.5" /> Atualização automática a cada 10 segundos{lastSyncAt ? ` · última sincronização às ${lastSyncAt.toLocaleTimeString("pt-BR")}` : ""}</p>
       </div>
       {selected && <DetailDrawer record={selected} onClose={() => setSelected(null)} />}
     </main>
