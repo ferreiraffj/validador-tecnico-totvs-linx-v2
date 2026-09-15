@@ -1,7 +1,3 @@
-import tasteone from "../../data/requirements/tasteone.json";
-import autoatendimento from "../../data/requirements/tasteone-autoatendimento.json";
-import degust from "../../data/requirements/degust.json";
-
 export type HubSystem = "TasteOne PDV" | "TasteOne Autoatendimento" | "Degust PDV";
 export type HubStatus = "APROVADO" | "APROVADO_RESSALVAS" | "REPROVADO";
 export type CollectionSystem = HubSystem;
@@ -57,6 +53,7 @@ export interface HubRecord {
 }
 
 const systemNames: HubSystem[] = ["TasteOne PDV", "TasteOne Autoatendimento", "Degust PDV"];
+const REQUIREMENT_VERSION = "2026.09";
 
 function asRecord(value: unknown): Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : {};
@@ -244,7 +241,6 @@ function auditPayload(record: Record<string, unknown>, system: HubSystem): {
   const hasBlockingNetwork = isWifi || hasSlowInternet;
   const explicitStatus = statusFromPayload(record);
   const status = explicitStatus ?? (hasBlockingNetwork ? "REPROVADO" : evidence < 3 ? "APROVADO_RESSALVAS" : "APROVADO");
-  const requirements = system === "TasteOne Autoatendimento" ? autoatendimento : system === "Degust PDV" ? degust : tasteone;
   const hardware = asRecord(record.hardware);
   const memoryDisplay = memory ? `${truncateNumber(memory)} GB` : "Não informado";
   const storageType = text(hardware.storageType);
@@ -257,7 +253,7 @@ function auditPayload(record: Record<string, unknown>, system: HubSystem): {
     { label: "Processador e memória", value: [processor, memoryDisplay].filter(Boolean).join(" · ") || "Não informado", passed: Boolean(processor && memory) },
     { label: "Armazenamento", value: storageDisplay, passed: Boolean(storage) },
     { label: "Rede e internet", value: [network, internetDisplay].filter(Boolean).join(" · ") || "Não informado", passed: Boolean(network && !hasBlockingNetwork) },
-    { label: "Matriz aplicada", value: `Requisitos ${text((requirements as { version?: unknown }).version) || "oficial"} · ${system}`, passed: true },
+    { label: "Matriz aplicada", value: `Requisitos ${REQUIREMENT_VERSION} · ${system}`, passed: true },
   ];
   const statusLabel = status === "APROVADO" ? "APROVADO" : status === "REPROVADO" ? "REPROVADO" : "APROVADO COM RESSALVAS";
   const action = status === "REPROVADO"
