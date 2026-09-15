@@ -1,0 +1,120 @@
+﻿{
+  "reportVersion": "1.4",
+  "collectedAtUtc": "2026-09-15T18:43:10.2942724Z",
+  "store": {
+    "storeName": "Casona A\u00E7ai",
+    "cnpj": "99999999999999",
+    "technicianName": "FELIPE",
+    "technicianPhone": "99999999999",
+    "selectedSystem": "TasteOne PDV"
+  },
+  "system": {
+    "operatingSystem": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200",
+    "build": "26200",
+    "architecture": "64-bit",
+    "machineName": "FELLPS_PC"
+  },
+  "processors": [
+    {
+      "model": "AMD Ryzen 5 5500",
+      "cores": 6,
+      "threads": 12,
+      "maxSpeedMhz": 3600,
+      "currentSpeedMhz": 3600
+    }
+  ],
+  "memory": {
+    "totalBytes": 17179869184,
+    "totalGb": 16,
+    "modules": [
+      {
+        "manufacturer": "Kingston",
+        "capacityBytes": 8589934592,
+        "capacityGb": 8,
+        "speedMhz": 2400,
+        "partNumber": "KHX2400C15/8G"
+      },
+      {
+        "manufacturer": "Kingston",
+        "capacityBytes": 8589934592,
+        "capacityGb": 8,
+        "speedMhz": 2400,
+        "partNumber": "HX426C16FB2/8"
+      }
+    ]
+  },
+  "storage": [
+    {
+      "driveLetter": "C:",
+      "model": "Reletech P600 M.2 SSD 500GB",
+      "storageType": "NVMe SSD",
+      "interface": "NVMe",
+      "totalBytes": 499143143424,
+      "freeBytes": 57494179840,
+      "totalGb": 464.86,
+      "freeGb": 53.55,
+      "freePercent": 11.52
+    },
+    {
+      "driveLetter": "D:",
+      "model": "KINGSTON SA400S37240G",
+      "storageType": "SSD",
+      "interface": "IDE",
+      "totalBytes": 238834151424,
+      "freeBytes": 24205627392,
+      "totalGb": 222.43,
+      "freeGb": 22.54,
+      "freePercent": 10.13
+    },
+    {
+      "driveLetter": "E:",
+      "model": "WDC WD10EURX-63C57Y0",
+      "storageType": "HDD",
+      "interface": "IDE",
+      "totalBytes": 999558213632,
+      "freeBytes": 310366265344,
+      "totalGb": 930.91,
+      "freeGb": 289.05,
+      "freePercent": 31.05
+    },
+    {
+      "driveLetter": "G:",
+      "model": "",
+      "storageType": "Desconhecido",
+      "interface": "Desconhecido",
+      "totalBytes": 429496729600,
+      "freeBytes": 54619467776,
+      "totalGb": 400,
+      "freeGb": 50.87,
+      "freePercent": 12.72
+    }
+  ],
+  "graphics": [
+    {
+      "model": "AMD Radeon RX 7600",
+      "driverVersion": "32.0.31041.1004",
+      "memoryBytes": 4293918720,
+      "memoryGb": 4
+    }
+  ],
+  "network": {
+    "adapter": "Ethernet",
+    "localIp": "192.168.18.196",
+    "gateway": "fe80::1%12",
+    "dns": "fe80::1%12",
+    "latencyMs": 82.0969,
+    "downloadMbps": 390.39701424363506,
+    "uploadMbps": 235.07701710772992,
+    "internetReachable": true,
+    "testEndpoint": "https://speed.cloudflare.com/__down?bytes=5000000"
+  },
+  "peripherals": {
+    "items": [],
+    "thermalPrinters": []
+  },
+  "status": {
+    "completed": true,
+    "errors": []
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0",
+  "collectionId": "loja-12345678000190-20260914T210000Z",
+  "collectedAt": "2026-09-14T21:00:00.000Z",
+  "store": {
+    "cnpj": "12.345.678/0001-90",
+    "tradeName": "Casa do Sabor",
+    "legalName": "Casa do Sabor Alimentação Ltda.",
+    "city": "São Paulo",
+    "state": "SP"
+  },
+  "system": "TasteOne PDV",
+  "collector": {
+    "name": "Mariana Costa",
+    "email": "mariana.costa@cliente.com",
+    "appVersion": "0.1.0"
+  },
+  "hardware": {
+    "operatingSystem": "Windows 11 Pro 64 bits",
+    "processor": "Intel Core i5 10ª geração",
+    "memoryGb": 16,
+    "storageGb": 512,
+    "storageType": "SSD",
+    "model": "Dell OptiPlex 7090"
+  },
+  "network": {
+    "connectionType": "ETHERNET",
+    "internetMbps": 100,
+    "dedicated": true,
+    "managedRouter": true
+  },
+  "peripherals": [
+    {
+      "type": "Impressora Cupom",
+      "manufacturer": "Bematech",
+      "model": "MP-4200 TH",
+      "connection": "USB"
+    }
+  ],
+  "metadata": {
+    "hostname": "PDV-01",
+    "operatingMode": "Servidor"
+  }
+}
