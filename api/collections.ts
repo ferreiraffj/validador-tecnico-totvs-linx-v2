@@ -3,7 +3,7 @@ import {
   HubRecord,
   normalizeCollectionPayload,
   validateCollectionPayload,
-} from "../src/shared/hub/auditImport";
+} from "../src/shared/hub/auditImport.js";
 
 const records: HubRecord[] = [];
 
