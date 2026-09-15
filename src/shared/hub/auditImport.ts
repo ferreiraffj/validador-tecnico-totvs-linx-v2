@@ -28,7 +28,7 @@ export interface CollectionPayload {
     processor?: string;
     memoryGb?: number;
     storageGb?: number;
-    storageType?: "SSD" | "HDD" | "eMMC" | "OUTRO";
+    storageType?: "SSD" | "HDD" | "NVMe" | "eMMC" | "OUTRO";
     model?: string;
   };
   network?: {
@@ -72,7 +72,8 @@ function numberValue(value: unknown): number | undefined {
 
 function normalizeStorageType(value: string): CollectionPayload["hardware"]["storageType"] {
   const normalized = value.toLowerCase();
-  if (normalized.includes("ssd") || normalized.includes("nvme")) return "SSD";
+  if (normalized.includes("nvme")) return "NVMe";
+  if (normalized.includes("ssd")) return "SSD";
   if (normalized.includes("hdd")) return "HDD";
   if (normalized.includes("emmc")) return "eMMC";
   return "OUTRO";
@@ -186,6 +187,12 @@ function text(value: unknown): string {
   return "";
 }
 
+function truncateNumber(value: string): string {
+  const parsed = Number.parseFloat(value.replace(",", "."));
+  if (!Number.isFinite(parsed)) return value;
+  return String(Math.trunc(parsed * 100) / 100);
+}
+
 function pick(record: Record<string, unknown>, keys: string[]): string {
   for (const key of keys) {
     const direct = text(record[key]);
@@ -238,11 +245,18 @@ function auditPayload(record: Record<string, unknown>, system: HubSystem): {
   const explicitStatus = statusFromPayload(record);
   const status = explicitStatus ?? (hasBlockingNetwork ? "REPROVADO" : evidence < 3 ? "APROVADO_RESSALVAS" : "APROVADO");
   const requirements = system === "TasteOne Autoatendimento" ? autoatendimento : system === "Degust PDV" ? degust : tasteone;
+  const hardware = asRecord(record.hardware);
+  const memoryDisplay = memory ? `${truncateNumber(memory)} GB` : "Não informado";
+  const storageType = text(hardware.storageType);
+  const storageDisplay = storage
+    ? `${truncateNumber(storage)} GB${storageType ? ` (${storageType})` : ""}`
+    : "Não informado";
+  const internetDisplay = internet ? `${truncateNumber(internet)} Mbps` : "Não informado";
   const checks = [
     { label: "Sistema operacional", value: os || "Não informado", passed: Boolean(os) },
-    { label: "Processador e memória", value: [processor, memory].filter(Boolean).join(" · ") || "Não informado", passed: Boolean(processor && memory) },
-    { label: "Armazenamento", value: storage || "Não informado", passed: Boolean(storage) },
-    { label: "Rede e internet", value: [network, internet].filter(Boolean).join(" · ") || "Não informado", passed: Boolean(network && !hasBlockingNetwork) },
+    { label: "Processador e memória", value: [processor, memoryDisplay].filter(Boolean).join(" · ") || "Não informado", passed: Boolean(processor && memory) },
+    { label: "Armazenamento", value: storageDisplay, passed: Boolean(storage) },
+    { label: "Rede e internet", value: [network, internetDisplay].filter(Boolean).join(" · ") || "Não informado", passed: Boolean(network && !hasBlockingNetwork) },
     { label: "Matriz aplicada", value: `Requisitos ${text((requirements as { version?: unknown }).version) || "oficial"} · ${system}`, passed: true },
   ];
   const statusLabel = status === "APROVADO" ? "APROVADO" : status === "REPROVADO" ? "REPROVADO" : "APROVADO COM RESSALVAS";
@@ -256,18 +270,15 @@ function auditPayload(record: Record<string, unknown>, system: HubSystem): {
 
 ## 1. Resumo da coleta
 - **Sistema:** ${system}
-- **Sistema operacional:** ${os || "Não informado"}
-- **Processador:** ${processor || "Não informado"}
-- **Memória:** ${memory || "Não informado"}
-- **Armazenamento:** ${storage || "Não informado"}
-- **Rede:** ${network || "Não informado"}
-- **Internet:** ${internet || "Não informado"}
+- ${checks[0].passed ? "✅" : "⚠️"} **Sistema operacional:** ${os || "Não informado"}
+- ${checks[1].passed ? "✅" : "⚠️"} **Processador:** ${processor || "Não informado"}
+- ${checks[1].passed ? "✅" : "⚠️"} **Memória Ram:** ${memoryDisplay}
+- ${checks[2].passed ? "✅" : "⚠️"} **Armazenamento:** ${storageDisplay}
+- ${checks[3].passed ? "✅" : "⚠️"} **Rede:** ${network || "Não informado"}
+- ${checks[3].passed ? "✅" : "⚠️"} **Internet:** ${internetDisplay}
 - **Equipamento:** ${device || "Não informado"}
 
-## 2. Análise técnica
-${checks.map((check) => `- ${check.passed ? "✅" : "⚠️"} **${check.label}:** ${check.value}`).join("\n")}
-
-## 3. Plano de ação
+## 2. Plano de ação
 ${action}
 
 _Auditoria automática baseada na matriz oficial TOTVS Linx Taste/Degust One._`;

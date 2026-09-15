@@ -24,6 +24,24 @@ function getPayloads(body: unknown): unknown[] {
   return [body];
 }
 
+function parseRequestBody(body: unknown): { value: unknown } | { error: string } {
+  if (typeof body === "string") {
+    try {
+      return { value: JSON.parse(body.replace(/^\uFEFF/, "")) };
+    } catch {
+      return { error: "O corpo da requisição não contém um JSON válido." };
+    }
+  }
+  if (Buffer.isBuffer(body)) {
+    try {
+      return { value: JSON.parse(body.toString("utf8").replace(/^\uFEFF/, "")) };
+    } catch {
+      return { error: "O corpo da requisição não contém um JSON válido." };
+    }
+  }
+  return { value: body };
+}
+
 export default function collectionsHandler(req: Request, res: Response): void {
   setCors(res);
   if (req.method === "OPTIONS") {
@@ -39,20 +57,31 @@ export default function collectionsHandler(req: Request, res: Response): void {
     return;
   }
 
-  const payloads = getPayloads(req.body);
+  const parsedBody = parseRequestBody(req.body);
+  if ("error" in parsedBody) {
+    res.status(400).json({ error: parsedBody.error });
+    return;
+  }
+
+  const payloads = getPayloads(parsedBody.value);
   const errors: Array<{ index: number; errors: string[] }> = [];
   const received: HubRecord[] = [];
   payloads.forEach((value, index) => {
-    const result = validateCollectionPayload(value);
-    if (result.valid === false) {
-      errors.push({ index, errors: result.errors });
-      return;
+    try {
+      const result = validateCollectionPayload(value);
+      if (result.valid === false) {
+        errors.push({ index, errors: result.errors });
+        return;
+      }
+      const record = normalizeCollectionPayload(result.payload);
+      const existingIndex = records.findIndex((item) => item.id === record.id);
+      if (existingIndex >= 0) records.splice(existingIndex, 1, record);
+      else records.unshift(record);
+      received.push(record);
+    } catch (error) {
+      console.error(`Falha ao processar a coleta no índice ${index}.`, error);
+      errors.push({ index, errors: ["Não foi possível processar esta coleta no Hub."] });
     }
-    const record = normalizeCollectionPayload(result.payload);
-    const existingIndex = records.findIndex((item) => item.id === record.id);
-    if (existingIndex >= 0) records.splice(existingIndex, 1, record);
-    else records.unshift(record);
-    received.push(record);
   });
 
   if (errors.length > 0) {
