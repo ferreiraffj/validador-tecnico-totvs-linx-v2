@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
 import { AlertTriangle, CheckCircle2, ChevronRight, FileJson, Filter, Inbox, Plus, RefreshCw, Search, ShieldCheck, Upload, X, XCircle } from "lucide-react";
-import Markdown from "react-markdown";
+import { ReportCard } from "./ReportCard";
 import { HubRecord, HubStatus, HubSystem, normalizeImportedPayload } from "../shared/hub/auditImport";
 
 interface HubDashboardProps {
@@ -121,6 +121,6 @@ function DetailDrawer({ record, onClose }: { record: HubRecord; onClose: () => v
   const Icon = config.icon;
   return <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm" onClick={onClose}><aside onClick={(event) => event.stopPropagation()} className="absolute right-0 top-0 flex h-full w-full max-w-2xl flex-col overflow-hidden bg-white shadow-2xl">
     <header className="flex items-start justify-between border-b border-slate-200 p-6"><div><p className="text-xs font-bold uppercase tracking-widest text-blue-600">{record.system}</p><h2 className="mt-2 text-2xl font-bold text-slate-950">{record.storeName}</h2><p className="mt-1 text-sm text-slate-500">{record.cnpj} · coletado por {record.collectedBy}</p></div><button onClick={onClose} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Fechar detalhe"><X className="h-5 w-5" /></button></header>
-    <div className="flex-1 overflow-y-auto p-6"><div className={`mb-6 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-bold ${config.classes}`}><Icon className="h-5 w-5" />{config.label}</div><div className="mb-7 grid gap-2 sm:grid-cols-2">{record.checks.map((check) => <div key={check.label} className="rounded-xl border border-slate-200 p-3"><p className="text-xs text-slate-500">{check.label}</p><p className="mt-1 text-sm font-semibold text-slate-800">{check.value}</p></div>)}</div><article className="prose prose-sm max-w-none leading-relaxed text-slate-700"><h3 className="text-lg font-bold text-slate-900">Resultado completo</h3><Markdown>{record.report}</Markdown></article></div>
+    <div className="flex-1 overflow-y-auto p-6"><ReportCard content={record.report} /></div>
   </aside></div>;
 }

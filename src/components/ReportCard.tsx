@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { CheckCircle2, AlertTriangle, XCircle, Copy, Check, Download, Printer, ShieldAlert, Award } from "lucide-react";
 import Markdown from "react-markdown";
 
@@ -8,6 +8,7 @@ interface ReportCardProps {
 
 export const ReportCard: React.FC<ReportCardProps> = ({ content }) => {
   const [copied, setCopied] = useState(false);
+  const reportRef = useRef<HTMLDivElement>(null);
 
   // Extract status
   let statusType: "APROVADO" | "RESSALVAS" | "REPROVADO" = "APROVADO";
@@ -26,13 +27,22 @@ export const ReportCard: React.FC<ReportCardProps> = ({ content }) => {
   };
 
   const handleDownload = () => {
-    const element = document.createElement("a");
-    const file = new Blob([content], { type: "text/plain;charset=utf-8" });
-    element.href = URL.createObjectURL(file);
-    element.download = `Laudo_Tecnico_Linx_Taste_One_${new Date().toISOString().slice(0, 10)}.txt`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    if (!reportRef.current) return;
+    const previousTitle = document.title;
+    const previousClass = document.body.className;
+    document.title = `Laudo_Tecnico_Linx_Taste_One_${new Date().toISOString().slice(0, 10)}`;
+    document.body.classList.add("printing-report");
+    reportRef.current.classList.add("report-card-print-target");
+
+    const restorePrintState = () => {
+      document.title = previousTitle;
+      document.body.className = previousClass;
+      reportRef.current?.classList.remove("report-card-print-target");
+      window.removeEventListener("afterprint", restorePrintState);
+    };
+
+    window.addEventListener("afterprint", restorePrintState);
+    window.print();
   };
 
   const handlePrint = () => {
@@ -40,7 +50,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ content }) => {
   };
 
   return (
-    <div className={`my-4 rounded-xl border-2 bg-white shadow-xl overflow-hidden transition-all duration-300 print:m-0 print:border-none print:shadow-none ${
+    <div ref={reportRef} className={`my-4 rounded-xl border-2 bg-white shadow-xl overflow-hidden transition-all duration-300 print:m-0 print:border-none print:shadow-none ${
       statusType === 'APROVADO'
         ? 'border-emerald-500/80 ring-1 ring-emerald-500/20'
         : statusType === 'RESSALVAS'
@@ -91,10 +101,10 @@ export const ReportCard: React.FC<ReportCardProps> = ({ content }) => {
           <button
             onClick={handleDownload}
             className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-black/20 hover:bg-black/30 border border-white/20 text-white transition"
-            title="Baixar Laudo Técnico (.txt)"
+            title="Baixar Laudo Técnico em PDF"
           >
             <Download className="w-3.5 h-3.5" />
-            Salvar
+            Baixar PDF
           </button>
           <button
             onClick={handlePrint}
