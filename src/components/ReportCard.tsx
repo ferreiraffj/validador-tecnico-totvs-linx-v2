@@ -77,7 +77,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ content }) => {
                 Laudo de Homologação Técnica
               </span>
               <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-black/25 backdrop-blur-sm border border-white/20">
-                <Award className="w-3 h-3" /> TOTVS Linx Taste One
+                <Award className="w-3 h-3" /> TOTVS Linx
               </span>
             </div>
             <h3 className="text-lg font-bold">
